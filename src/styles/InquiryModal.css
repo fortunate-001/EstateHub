@@ -1,0 +1,116 @@
+.inquiry-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.inquiry-modal {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.modal-header {
+  text-align: center;
+  padding: 30px 20px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header i {
+  font-size: 50px;
+  color: #25D366;
+  margin-bottom: 10px;
+}
+
+.modal-header h2 {
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.modal-header p {
+  color: var(--text-secondary);
+}
+
+.inquiry-modal form {
+  padding: 20px;
+}
+
+.submit-inquiry {
+  width: 100%;
+  padding: 14px;
+  background-color: #25D366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: 0.3s;
+}
+
+.submit-inquiry:hover {
+  background-color: #128C7E;
+}
+
+.submit-inquiry:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.success-message {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.success-message i {
+  font-size: 60px;
+  color: #10b981;
+  margin-bottom: 20px;
+}
+
+.success-message h3 {
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.success-message p {
+  color: var(--text-secondary);
+}

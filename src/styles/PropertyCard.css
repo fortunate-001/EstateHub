@@ -1,0 +1,269 @@
+/* Property Card Styles - Clean & Modern */
+.property-card-new {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.35s ease;
+  cursor: pointer;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color);
+}
+
+.property-card-new:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Image Section */
+.card-image-new {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card-image-new img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.property-card-new:hover .card-image-new img {
+  transform: scale(1.08);
+}
+
+/* Overlay on Hover */
+.image-overlay-new {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.property-card-new:hover .image-overlay-new {
+  opacity: 1;
+}
+
+.view-btn {
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border: 2px solid white;
+  border-radius: 40px;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+  background: white;
+  color: #667eea;
+  transform: scale(1.05);
+}
+
+/* Badges */
+.card-badges {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.type-badge {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.available {
+  background: #10b981;
+  color: white;
+}
+
+.status-badge.sold {
+  background: #ef4444;
+  color: white;
+}
+
+.status-badge.pending {
+  background: #f59e0b;
+  color: white;
+}
+
+/* Card Content */
+.card-details-new {
+  padding: 20px;
+}
+
+/* Price Row */
+.price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.price-new {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.price-label-new {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Title */
+.title-new {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.35;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.title-new:hover {
+  color: var(--primary);
+}
+
+/* Location */
+.location-new {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Specs Row */
+.specs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+}
+
+.spec {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.spec-number {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.spec-name {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spec-divider {
+  width: 1px;
+  height: 30px;
+  background: var(--border-color);
+}
+
+/* Inquiry Button */
+.inquiry-btn-new {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.inquiry-btn-new:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  letter-spacing: 1.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-image-new {
+    height: 200px;
+  }
+  
+  .price-new {
+    font-size: 20px;
+  }
+  
+  .title-new {
+    font-size: 16px;
+  }
+  
+  .spec-number {
+    font-size: 14px;
+  }
+  
+  .card-details-new {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-image-new {
+    height: 180px;
+  }
+  
+  .specs-row {
+    padding: 8px 12px;
+  }
+  
+  .inquiry-btn-new {
+    padding: 10px;
+    font-size: 12px;
+  }
+}
