@@ -1,17 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useTheme } from "../context/ThemeContext";
 import "../styles/navbar.css";
 
-export default function Navbar() {
+function Navbar() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { darkMode, toggleTheme } = useTheme();
+  const mobileMenuRef = useRef(null);
+  const hamburgerBtnRef = useRef(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -25,6 +27,24 @@ export default function Navbar() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, [mobileMenuOpen]);
 
   const handleLogout = async () => {
     try {
@@ -61,15 +81,58 @@ export default function Navbar() {
     const handleClickOutside = (event) => {
       if (
         mobileMenuOpen &&
-        !event.target.closest(".mobile-menu") &&
-        !event.target.closest(".mobile-menu-btn")
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        hamburgerBtnRef.current &&
+        !hamburgerBtnRef.current.contains(event.target)
       ) {
         setMobileMenuOpen(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [mobileMenuOpen]);
+
+  // Block only horizontal swipe gestures while allowing vertical scroll
+  useEffect(() => {
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const handleTouchStart = (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e) => {
+      // Only prevent if it's a horizontal swipe and menu is closed
+      if (!mobileMenuOpen) {
+        const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+        const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+        
+        // If horizontal swipe (more horizontal than vertical) and significant
+        if (deltaX > deltaY && deltaX > 30) {
+          e.preventDefault();
+          return false;
+        }
+      }
+    };
+
+    // Only add listeners on mobile devices
+    if (window.innerWidth <= 768) {
+      document.addEventListener('touchstart', handleTouchStart, { passive: false });
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    }
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [mobileMenuOpen]);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
     <nav className="navbar">
@@ -90,7 +153,6 @@ export default function Navbar() {
 
         {/* Desktop Right Section */}
         <div className="nav-right">
-          {/* User Icon with Dropdown - Contains Dark Mode */}
           <div className="user-icon-container">
             <i
               className={user ? "bx bxs-user-check" : "bx bx-user"}
@@ -153,108 +215,139 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
+            ref={hamburgerBtnRef}
             className="mobile-menu-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
           >
             <i className={mobileMenuOpen ? "bx bx-x" : "bx bx-menu"}></i>
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu - Stylish Full Screen */}
-      <div className={`mobile-menu ${mobileMenuOpen ? "active" : ""}`}>
-        <div className="mobile-menu-content">
-          <div className="mobile-user-section">
-            {user ? (
-              <>
-                <i className="bx bxs-user-circle"></i>
-                <div className="mobile-user-info">
-                  <h3>{getUserName()}</h3>
-                  <p>{user.email}</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <i className="bx bx-user-circle"></i>
-                <div className="mobile-user-info">
-                  <h3>Welcome Guest</h3>
-                  <p>Login or Register to continue</p>
-                </div>
-              </>
-            )}
+      {/* Mobile Menu Overlay - Click to close */}
+      <div 
+        className={`mobile-menu-overlay ${mobileMenuOpen ? "active" : ""}`} 
+        onClick={() => setMobileMenuOpen(false)}
+      ></div>
+      
+      {/* Mobile Menu - ONLY opens via hamburger click */}
+      <div 
+        ref={mobileMenuRef}
+        className={`mobile-menu ${mobileMenuOpen ? "active" : ""}`}
+      >
+        <div className="mobile-menu-header">
+          <div className="mobile-logo">
+            <span>EstateHub</span>
           </div>
+          <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
+            <i className="bx bx-x"></i>
+          </button>
+        </div>
 
-          <div className="mobile-nav-links">
-            <div
-              className="mobile-nav-item"
-              onClick={() => handleNavigation("/")}
-            >
+        {/* User Profile Section */}
+        <div className="mobile-profile-section">
+          {user ? (
+            <div className="mobile-user-card">
+              <div className="user-avatar">
+                <i className="bx bxs-user-circle"></i>
+              </div>
+              <div className="user-welcome">
+                <p className="welcome-text">{getGreeting()}</p>
+                <h3 className="user-name-mobile">{getUserName()}</h3>
+                <p className="user-email">{user.email}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="mobile-guest-card">
+              <div className="guest-avatar">
+                <i className="bx bx-user-circle"></i>
+              </div>
+              <div className="guest-info">
+                <h3>Welcome Guest</h3>
+                <p>Sign in to access your account</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation Links */}
+        <div className="mobile-nav-items">
+          <div className="mobile-nav-group">
+            <div className="nav-group-title">
+              <i className="bx bx-navigation"></i>
+              <span>Main Menu</span>
+            </div>
+            <div className="mobile-nav-link" onClick={() => handleNavigation("/")}>
               <i className="bx bx-home"></i>
               <span>Home</span>
-              <i className="bx bx-right-arrow-alt arrow"></i>
+              <i className="bx bx-chevron-right"></i>
             </div>
-            <div
-              className="mobile-nav-item"
-              onClick={() => handleNavigation("/properties")}
-            >
+            <div className="mobile-nav-link" onClick={() => handleNavigation("/properties")}>
               <i className="bx bx-building"></i>
               <span>Properties</span>
-              <i className="bx bx-right-arrow-alt arrow"></i>
+              <i className="bx bx-chevron-right"></i>
             </div>
-            <div
-              className="mobile-nav-item"
-              onClick={() => handleNavigation("/contact")}
-            >
-              <i className="bx bx-phone"></i>
+            <div className="mobile-nav-link" onClick={() => handleNavigation("/contact")}>
+              <i className="bx bx-envelope"></i>
               <span>Contact</span>
-              <i className="bx bx-right-arrow-alt arrow"></i>
+              <i className="bx bx-chevron-right"></i>
             </div>
             {user && isAdmin && (
-              <div
-                className="mobile-nav-item"
-                onClick={() => handleNavigation("/admin")}
-              >
+              <div className="mobile-nav-link" onClick={() => handleNavigation("/admin")}>
                 <i className="bx bx-dashboard"></i>
                 <span>Admin Dashboard</span>
-                <i className="bx bx-right-arrow-alt arrow"></i>
+                <i className="bx bx-chevron-right"></i>
               </div>
             )}
           </div>
 
-          <div className="mobile-divider"></div>
+          {user && (
+            <div className="mobile-nav-group">
+              <div className="nav-group-title">
+                <i className="bx bx-user"></i>
+                <span>Account</span>
+              </div>
+              <div className="mobile-nav-link" onClick={() => handleNavigation("/profile")}>
+                <i className="bx bx-user-circle"></i>
+                <span>My Profile</span>
+                <i className="bx bx-chevron-right"></i>
+              </div>
+              <div className="mobile-nav-link" onClick={handleLogout}>
+                <i className="bx bx-log-out"></i>
+                <span>Logout</span>
+                <i className="bx bx-chevron-right"></i>
+              </div>
+            </div>
+          )}
+        </div>
 
-          {/* Dark Mode in Mobile Menu */}
-          <div className="mobile-nav-item" onClick={toggleTheme}>
+        {/* Theme Toggle & Footer */}
+        <div className="mobile-menu-footer">
+          <div className="mobile-theme-toggle" onClick={toggleTheme}>
             <i className={darkMode ? "bx bx-sun" : "bx bx-moon"}></i>
             <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
-            <i className="bx bx-right-arrow-alt arrow"></i>
           </div>
-
-          {!user ? (
+          
+          {!user && (
             <div className="mobile-auth-buttons">
-              <button
-                className="mobile-login-btn"
-                onClick={() => handleNavigation("/login")}
-              >
+              <button className="mobile-auth-login" onClick={() => handleNavigation("/login")}>
                 Login
               </button>
-              <button
-                className="mobile-register-btn"
-                onClick={() => handleNavigation("/register")}
-              >
+              <button className="mobile-auth-register" onClick={() => handleNavigation("/register")}>
                 Register
               </button>
             </div>
-          ) : (
-            <button className="mobile-logout-btn" onClick={handleLogout}>
-              <i className="bx bx-log-out"></i>
-              Logout
-            </button>
           )}
+          
+          <div className="mobile-footer-text">
+            <p>© 2024 EstateHub. All rights reserved.</p>
+          </div>
         </div>
       </div>
     </nav>
   );
 }
+
+export default Navbar;

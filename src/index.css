@@ -6,7 +6,6 @@
   /* overflow-x: hidden; */
   /* webkit-font-smoothing: antialiased; */
   /* -moz-osx-font-smoothing: grayscale; */
-
 }
 
 /* CSS Variables for Light Mode (Default) */
@@ -246,13 +245,12 @@ body {
   }
 }
 
-
 /* Image Fallback */
 img {
   background-color: var(--bg-secondary);
 }
 
-img[src=""], 
+img[src=""],
 img:not([src]) {
   opacity: 0;
 }

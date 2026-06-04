@@ -1,60 +1,62 @@
-import React, { useState } from 'react'
-import { db } from '../firebase/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { sendContactEmail } from '../data/emailjs'
-import '../styles/Contact.css'
+import React, { useState } from "react";
+import { db } from "../firebase/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { sendContactEmail } from "../data/emailjs";
+import "../styles/Contact.css";
 
 function Contact() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  })
-  const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState('')
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSubmitting(true)
-    setError('')
-    
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
     try {
       // Save to Firestore
       await addDoc(collection(db, "contacts"), {
         ...formData,
         createdAt: serverTimestamp(),
-        status: 'unread'
-      })
-      
+        status: "unread",
+      });
+
       // Send email via EmailJS
-      const emailResult = await sendContactEmail(formData)
-      
+      const emailResult = await sendContactEmail(formData);
+
       if (emailResult.success) {
-        setSuccess(true)
-        setFormData({ name: '', email: '', subject: '', message: '' })
-        setTimeout(() => setSuccess(false), 5000)
+        setSuccess(true);
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setTimeout(() => setSuccess(false), 5000);
       } else {
-        setError('Email sending failed, but your message was saved. We will contact you soon.')
+        setError(
+          "Email sending failed, but your message was saved. We will contact you soon.",
+        );
       }
     } catch (error) {
-      console.error('Error:', error)
-      setError('Failed to send message. Please try again.')
+      console.error("Error:", error);
+      setError("Failed to send message. Please try again.");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
-  const phoneNumber = "2348123456789"
-  const emailAddress = "fortunateolawale7@gmail.com"
+  const phoneNumber = "2348123456789";
+  const emailAddress = "fortunateolawale7@gmail.com";
 
   return (
     <div className="contact-page">
@@ -66,28 +68,28 @@ function Contact() {
       <div className="contact-container">
         <div className="contact-info">
           <div className="info-card">
-            <i className='bx bx-phone'></i>
+            <i className="bx bx-phone"></i>
             <h3>Phone</h3>
             <p>+234 812 345 6789</p>
             <p>+234 801 234 5678</p>
           </div>
 
           <div className="info-card">
-            <i className='bx bx-envelope'></i>
+            <i className="bx bx-envelope"></i>
             <h3>Email</h3>
             <p>{emailAddress}</p>
             <p>support@estatehub.com</p>
           </div>
 
           <div className="info-card">
-            <i className='bx bx-map'></i>
+            <i className="bx bx-map"></i>
             <h3>Address</h3>
             <p>Lekki Phase 1, Lagos</p>
             <p>Nigeria</p>
           </div>
 
           <div className="info-card">
-            <i className='bx bx-time'></i>
+            <i className="bx bx-time"></i>
             <h3>Working Hours</h3>
             <p>Monday - Friday: 9am - 6pm</p>
             <p>Saturday: 10am - 4pm</p>
@@ -99,13 +101,13 @@ function Contact() {
           <h2>Send us a Message</h2>
           {success && (
             <div className="success-alert">
-              <i className='bx bx-check-circle'></i>
+              <i className="bx bx-check-circle"></i>
               Message sent successfully! We'll get back to you soon.
             </div>
           )}
           {error && (
             <div className="error-alert">
-              <i className='bx bx-error-circle'></i>
+              <i className="bx bx-error-circle"></i>
               {error}
             </div>
           )}
@@ -134,7 +136,7 @@ function Contact() {
                 />
               </div>
             </div>
-            
+
             <div className="form-group">
               <label>Subject *</label>
               <input
@@ -146,7 +148,7 @@ function Contact() {
                 placeholder="Message subject"
               />
             </div>
-            
+
             <div className="form-group">
               <label>Message *</label>
               <textarea
@@ -158,9 +160,9 @@ function Contact() {
                 placeholder="Write your message here..."
               ></textarea>
             </div>
-            
+
             <button type="submit" className="submit-btn" disabled={submitting}>
-              {submitting ? 'Sending...' : 'Send Message'}
+              {submitting ? "Sending..." : "Send Message"}
             </button>
           </form>
         </div>
@@ -179,7 +181,7 @@ function Contact() {
         ></iframe>
       </div>
     </div>
-  )
+  );
 }
 
-export default Contact
+export default Contact;

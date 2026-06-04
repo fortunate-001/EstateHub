@@ -1,80 +1,80 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import { auth, db } from '../firebase/firebase'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
-import '../styles/Auth.css'
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { auth, db } from "../firebase/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import "../styles/Auth.css";
 
 function Register() {
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Validation Schema with age and gender
   const validationSchema = Yup.object({
     name: Yup.string()
-      .min(2, 'Name must be at least 2 characters')
-      .max(50, 'Name cannot exceed 50 characters')
-      .required('Name is required'),
+      .min(2, "Name must be at least 2 characters")
+      .max(50, "Name cannot exceed 50 characters")
+      .required("Name is required"),
     email: Yup.string()
-      .email('Invalid email address')
-      .required('Email is required'),
+      .email("Invalid email address")
+      .required("Email is required"),
     age: Yup.number()
-      .min(18, 'You must be at least 18 years old')
-      .max(100, 'Age cannot exceed 100')
-      .required('Age is required'),
+      .min(18, "You must be at least 18 years old")
+      .max(100, "Age cannot exceed 100")
+      .required("Age is required"),
     gender: Yup.string()
-      .oneOf(['male', 'female', 'other'], 'Please select gender')
-      .required('Gender is required'),
+      .oneOf(["male", "female", "other"], "Please select gender")
+      .required("Gender is required"),
     phone: Yup.string()
-      .matches(/^[0-9]{10,15}$/, 'Please enter a valid phone number')
-      .required('Phone number is required'),
+      .matches(/^[0-9]{10,15}$/, "Please enter a valid phone number")
+      .required("Phone number is required"),
     password: Yup.string()
-      .min(6, 'Password must be at least 6 characters')
-      .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .matches(/[0-9]/, 'Password must contain at least one number')
-      .required('Password is required'),
+      .min(6, "Password must be at least 6 characters")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .required("Password is required"),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password'), null], 'Passwords must match')
-      .required('Please confirm your password')
-  })
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Please confirm your password"),
+  });
 
   const formik = useFormik({
     initialValues: {
-      name: '',
-      email: '',
-      age: '',
-      gender: '',
-      phone: '',
-      password: '',
-      confirmPassword: ''
+      name: "",
+      email: "",
+      age: "",
+      gender: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      setError('')
-      setSuccess('')
-      setLoading(true)
-      
+      setError("");
+      setSuccess("");
+      setLoading(true);
+
       try {
-        console.log('📝 Starting registration for:', values.email)
-        
+        console.log("📝 Starting registration for:", values.email);
+
         // Create user with email and password
         const userCredential = await createUserWithEmailAndPassword(
-          auth, 
-          values.email, 
-          values.password
-        )
-        
-        console.log('✅ User created in Auth:', userCredential.user.uid)
-        
+          auth,
+          values.email,
+          values.password,
+        );
+
+        console.log("✅ User created in Auth:", userCredential.user.uid);
+
         // Update user profile with name
         await updateProfile(userCredential.user, {
-          displayName: values.name
-        })
-        
+          displayName: values.name,
+        });
+
         // Save user data to Firestore with age, gender, phone
         const userData = {
           name: values.name,
@@ -86,35 +86,34 @@ function Register() {
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
           loginCount: 1,
-          role: 'user',
-          status: 'active'
-        }
-        
-        await setDoc(doc(db, "users", userCredential.user.uid), userData)
-        
-        console.log('✅ User saved to Firestore with age & gender!')
-        
-        setSuccess('Account created successfully! Redirecting...')
-        
+          role: "user",
+          status: "active",
+        };
+
+        await setDoc(doc(db, "users", userCredential.user.uid), userData);
+
+        console.log("✅ User saved to Firestore with age & gender!");
+
+        setSuccess("Account created successfully! Redirecting...");
+
         setTimeout(() => {
-          navigate('/')
-        }, 2000)
-        
+          navigate("/");
+        }, 2000);
       } catch (err) {
-        console.error('❌ Registration error:', err)
-        
-        if (err.code === 'auth/email-already-in-use') {
-          setError('Email already in use. Please login instead.')
-        } else if (err.code === 'auth/weak-password') {
-          setError('Password is too weak. Please use a stronger password.')
+        console.error("❌ Registration error:", err);
+
+        if (err.code === "auth/email-already-in-use") {
+          setError("Email already in use. Please login instead.");
+        } else if (err.code === "auth/weak-password") {
+          setError("Password is too weak. Please use a stronger password.");
         } else {
-          setError('Failed to create account: ' + err.message)
+          setError("Failed to create account: " + err.message);
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-  })
+    },
+  });
 
   return (
     <div className="auth-container">
@@ -136,7 +135,9 @@ function Register() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
-            {formik.touched.name && formik.errors.name && <div className="field-error">{formik.errors.name}</div>}
+            {formik.touched.name && formik.errors.name && (
+              <div className="field-error">{formik.errors.name}</div>
+            )}
           </div>
 
           <div className="form-group">
@@ -149,7 +150,9 @@ function Register() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
-            {formik.touched.email && formik.errors.email && <div className="field-error">{formik.errors.email}</div>}
+            {formik.touched.email && formik.errors.email && (
+              <div className="field-error">{formik.errors.email}</div>
+            )}
           </div>
 
           <div className="form-row">
@@ -163,7 +166,9 @@ function Register() {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
-              {formik.touched.age && formik.errors.age && <div className="field-error">{formik.errors.age}</div>}
+              {formik.touched.age && formik.errors.age && (
+                <div className="field-error">{formik.errors.age}</div>
+              )}
             </div>
 
             <div className="form-group">
@@ -179,7 +184,9 @@ function Register() {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
-              {formik.touched.gender && formik.errors.gender && <div className="field-error">{formik.errors.gender}</div>}
+              {formik.touched.gender && formik.errors.gender && (
+                <div className="field-error">{formik.errors.gender}</div>
+              )}
             </div>
           </div>
 
@@ -193,7 +200,9 @@ function Register() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
-            {formik.touched.phone && formik.errors.phone && <div className="field-error">{formik.errors.phone}</div>}
+            {formik.touched.phone && formik.errors.phone && (
+              <div className="field-error">{formik.errors.phone}</div>
+            )}
           </div>
 
           <div className="form-group">
@@ -206,7 +215,9 @@ function Register() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
-            {formik.touched.password && formik.errors.password && <div className="field-error">{formik.errors.password}</div>}
+            {formik.touched.password && formik.errors.password && (
+              <div className="field-error">{formik.errors.password}</div>
+            )}
           </div>
 
           <div className="form-group">
@@ -219,11 +230,16 @@ function Register() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
-            {formik.touched.confirmPassword && formik.errors.confirmPassword && <div className="field-error">{formik.errors.confirmPassword}</div>}
+            {formik.touched.confirmPassword &&
+              formik.errors.confirmPassword && (
+                <div className="field-error">
+                  {formik.errors.confirmPassword}
+                </div>
+              )}
           </div>
 
           <button type="submit" className="auth-btn" disabled={loading}>
-            {loading ? 'Creating account...' : 'Register'}
+            {loading ? "Creating account..." : "Register"}
           </button>
         </form>
 
@@ -232,7 +248,7 @@ function Register() {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export default Register
+export default Register;

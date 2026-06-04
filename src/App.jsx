@@ -1,9 +1,9 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"; // Remove BrowserRouter from here
 import { ThemeProvider } from "./context/ThemeContext";
-import { useEffect } from 'react';
-import { db } from './firebase/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { useEffect } from "react";
+import { db } from "./firebase/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import Navbar from "./components/Navbar";
 import WhatsAppButton from "./components/WhatsAppButton";
 import Home from "./pages/Home";
@@ -29,6 +29,7 @@ function App() {
     };
     testFirestore();
   }, []);
+
   return (
     <ThemeProvider>
       <div>

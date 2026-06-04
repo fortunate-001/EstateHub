@@ -522,7 +522,7 @@ function Admin() {
                 database
               </p>
               <button className="quick-add-btn" onClick={quickAddProperties}>
-                 Add Sample Properties 
+                Add Sample Properties
               </button>
             </div>
           </div>

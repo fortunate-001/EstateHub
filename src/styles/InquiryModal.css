@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -52,7 +52,7 @@
 
 .modal-header i {
   font-size: 50px;
-  color: #25D366;
+  color: #25d366;
   margin-bottom: 10px;
 }
 
@@ -72,7 +72,7 @@
 .submit-inquiry {
   width: 100%;
   padding: 14px;
-  background-color: #25D366;
+  background-color: #25d366;
   color: white;
   border: none;
   border-radius: 8px;
@@ -87,7 +87,7 @@
 }
 
 .submit-inquiry:hover {
-  background-color: #128C7E;
+  background-color: #128c7e;
 }
 
 .submit-inquiry:disabled {
